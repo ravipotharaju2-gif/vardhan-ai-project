@@ -1,3 +1,4 @@
+
 // Vardhan AI — Netlify Gemini API
 
 const reply = (statusCode, payload) => ({
@@ -19,11 +20,18 @@ exports.handler = async (event) => {
 
     if (!apiKey) {
       return reply(500, {
-        error: "Please configure GEMINI_API_KEY in Netlify."
+        error: "GEMINI_API_KEY is missing in Netlify."
       });
     }
 
-    const body = JSON.parse(event.body || "{}");
+    let body;
+
+    try {
+      body = JSON.parse(event.body || "{}");
+    } catch {
+      return reply(400, { error: "Invalid request format." });
+    }
+
     const prompt = typeof body.prompt === "string"
       ? body.prompt.trim()
       : "";
@@ -57,9 +65,10 @@ exports.handler = async (event) => {
     parts.push({ text: prompt });
 
     const imageMode = mode === "image";
+
     const model = imageMode
-      ? (process.env.GEMINI_IMAGE_MODEL || "gemini-2.5-flash-image")
-     : (process.env.GEMINI_MODEL || "gemini-3.8-flash");
+      ? (process.env.GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image")
+      : (process.env.GEMINI_MODEL || "gemini-3.8-flash");
 
     const generationConfig = {
       maxOutputTokens: imageMode ? 2048 : 4096
@@ -78,19 +87,44 @@ exports.handler = async (event) => {
       requestBody.tools = [{ google_search: {} }];
     }
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey
-        },
-        body: JSON.stringify(requestBody)
-      }
-    );
+    let response;
 
-    const result = await response.json();
+    try {
+      response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey
+          },
+          body: JSON.stringify(requestBody),
+          signal: AbortSignal.timeout(24000)
+        }
+      );
+    } catch (error) {
+      if (error.name === "TimeoutError" || error.name === "AbortError") {
+        return reply(504, {
+          error: "Gemini took too long to respond. Please try again."
+        });
+      }
+
+      return reply(502, {
+        error: "Could not connect to Gemini. Please try again."
+      });
+    }
+
+    const responseText = await response.text();
+
+    let result;
+
+    try {
+      result = JSON.parse(responseText);
+    } catch {
+      return reply(502, {
+        error: "Gemini returned an invalid response."
+      });
+    }
 
     if (!response.ok) {
       return reply(response.status, {
@@ -99,6 +133,7 @@ exports.handler = async (event) => {
     }
 
     const output = result?.candidates?.[0]?.content?.parts || [];
+
     const answer = output
       .filter(p => typeof p.text === "string" && !p.thought)
       .map(p => p.text)
@@ -119,10 +154,13 @@ exports.handler = async (event) => {
     }
 
     if (!answer) {
-      return reply(502, { error: "Gemini returned no text. Please try again." });
+      return reply(502, {
+        error: "Gemini returned no text. Please try again."
+      });
     }
 
     return reply(200, { text: answer });
+
   } catch (error) {
     return reply(500, {
       error: error.message || "Unexpected server error."
