@@ -59,7 +59,7 @@ exports.handler = async (event) => {
     const imageMode = mode === "image";
     const model = imageMode
       ? (process.env.GEMINI_IMAGE_MODEL || "gemini-2.5-flash-image")
-      : (process.env.GEMINI_MODEL || "gemini-2.5-flash");
+      : (process.env.GEMINI_MODEL || "gemini-3.8-flash");
 
     const generationConfig = {
       maxOutputTokens: imageMode ? 2048 : 4096
