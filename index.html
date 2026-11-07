@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Vardhan AI – Futuristic AI Assistant | Created by Potharaju Srivardhan</title>
+<meta name="description" content="Vardhan AI is a futuristic AI assistant with deep thinking, image creation, voice, camera and document (PDF/Word) support. Created by Potharaju Srivardhan.">
+<meta name="author" content="Potharaju Srivardhan"><meta name="theme-color" content="#07030f">
+<link rel="manifest" href="/manifest.json"><link rel="icon" href="/icons/icon-192.png"><link rel="apple-touch-icon" href="/icons/icon-192.png">
+<meta property="og:title" content="Vardhan AI – Futuristic AI Assistant"><meta property="og:description" content="Deep thinking, image creation, voice, camera and documents. Created by Potharaju Srivardhan."><meta property="og:type" content="website">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+:root{--bg:#07030f;--p:#a259ff;--p2:#6d28d9;--t:#efe8ff;--m:#9b8cc4;--g:rgba(30,14,60,.55);--b:rgba(162,89,255,.3);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--t);font-family:'Orbitron','Segoe UI',system-ui,sans-serif;overflow:hidden}
+#stars{position:fixed;inset:0;z-index:0}
+.glow{position:fixed;width:60vw;height:60vw;border-radius:50%;filter:blur(90px);opacity:.35;z-index:0;animation:fl 14s ease-in-out infinite alternate}
+.g1{background:#6d28d9;top:-20vw;left:-15vw}.g2{background:#c026d3;bottom:-25vw;right:-15vw;animation-delay:-7s}
+@keyframes fl{to{transform:translate(8vw,6vw) scale(1.2)}}
+.hide{display:none!important}.auth-tab.on{background:rgba(162,89,255,.35)!important;border:1px solid var(--b)!important}#memoryModal:not(.hide){display:flex!important}#memoryList .memory-item{padding:10px;border:1px solid var(--b);border-radius:12px;font-size:13px;display:flex;gap:10px;align-items:flex-start;justify-content:space-between}#memoryList .memory-item button{background:transparent;border:1px solid var(--b);color:#fda4af;border-radius:8px;padding:4px 8px;cursor:pointer}
+.glass{background:var(--g);border:1px solid var(--b);backdrop-filter:blur(18px);border-radius:22px;box-shadow:0 0 40px rgba(124,58,237,.25)}
+#login{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{width:min(400px,100%);padding:34px 26px;text-align:center;animation:rise .9s both}
+@keyframes rise{from{opacity:0;transform:translateY(30px) scale(.95)}}
+.logo{font-size:40px;font-weight:800;letter-spacing:3px;background:linear-gradient(120deg,#fff,var(--p),#e879f9);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 30px var(--p);animation:pulse 3s infinite}
+@keyframes pulse{50%{filter:drop-shadow(0 0 18px var(--p))}}
+.sub{color:var(--m);font-size:12px;letter-spacing:2px;margin:6px 0 22px}
+input,textarea{font-family:inherit;color:#fff;-webkit-text-fill-color:#fff;background:rgba(10,4,24,.7);border:1px solid var(--b);border-radius:14px;outline:none}
+.card input{width:100%;padding:14px;font-size:16px;margin-bottom:14px;color:#fff!important;-webkit-text-fill-color:#fff!important;caret-color:#e9d5ff;background:#120a26!important;font-family:'Segoe UI',system-ui,sans-serif;letter-spacing:1px}.card input::placeholder{color:#9b8cc4;-webkit-text-fill-color:#9b8cc4}.card input:-webkit-autofill{-webkit-text-fill-color:#fff!important;-webkit-box-shadow:0 0 0 100px #120a26 inset!important}
+input:focus,textarea:focus{border-color:var(--p);box-shadow:0 0 18px rgba(162,89,255,.5)}
+.btn{background:linear-gradient(135deg,var(--p2),var(--p));color:#fff;border:0;border-radius:14px;padding:13px 20px;font-family:inherit;font-weight:700;letter-spacing:1px;cursor:pointer;transition:.25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 28px var(--p)}
+.card .btn{width:100%}
+.note{font-size:11px;color:var(--m);margin-top:14px}
+#app{position:fixed;inset:0;z-index:2;display:flex;padding-top:env(safe-area-inset-top,0px)}
+#side{width:270px;padding:14px;display:flex;flex-direction:column;gap:10px;margin:10px;transition:.3s}
+#hist{flex:1;overflow:auto;display:flex;flex-direction:column;gap:6px}
+.h{padding:10px 12px;border-radius:12px;font-size:13px;cursor:pointer;border:1px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--m)}
+.h:hover,.h.on{border-color:var(--b);background:rgba(162,89,255,.15);color:var(--t)}
+#main{flex:1;display:flex;flex-direction:column;min-width:0;padding:10px 10px 10px 0}
+#top{display:flex;align-items:center;gap:10px;padding:6px 8px}
+#menu{display:none;background:none;border:1px solid var(--b);color:var(--t);border-radius:10px;padding:6px 10px;font-size:18px}
+#chat{flex:1;overflow:auto;padding:10px 8px;display:flex;flex-direction:column;gap:14px}
+.hero{margin:auto;text-align:center;animation:rise 1s both}
+.hero .logo{font-size:clamp(30px,9vw,52px)}.hero p{color:var(--m)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+.chip{padding:9px 14px;border:1px solid var(--b);border-radius:20px;font-size:12px;cursor:pointer;background:var(--g)}
+.chip:hover{box-shadow:0 0 18px var(--p)}
+.msg{max-width:min(820px,92%);padding:14px 16px;border-radius:18px;line-height:1.6;font-size:15px;white-space:pre-wrap;word-wrap:break-word;animation:rise .4s both;font-family:'Segoe UI',system-ui,sans-serif}
+.u{align-self:flex-end;background:linear-gradient(135deg,var(--p2),#8b3dff)}
+.a{align-self:flex-start;background:var(--g);border:1px solid var(--b)}
+.a svg{max-width:100%;height:auto;background:#0b0618;border-radius:12px;margin-top:8px}
+.act{display:flex;gap:8px;margin-top:10px}.act button{background:none;border:1px solid var(--b);color:var(--m);border-radius:10px;padding:5px 10px;font-size:12px;cursor:pointer}
+.act button:hover{color:#fff;border-color:var(--p)}
+.think{display:flex;gap:6px;align-items:center;color:var(--m);font-size:13px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--p);animation:bn 1.2s infinite}.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes bn{50%{transform:translateY(-8px);opacity:.4}}
+#bar{padding:8px;position:relative}
+#box{display:flex;align-items:flex-end;gap:8px;padding:8px;border-radius:26px;animation:bd 5s infinite}
+@keyframes bd{50%{box-shadow:0 0 50px rgba(192,38,211,.4)}}
+#q{flex:1;resize:none;border:0;background:transparent;padding:10px 4px;font-size:15px;max-height:140px;box-shadow:none!important}
+.ic{width:42px;height:42px;border-radius:50%;border:1px solid var(--b);background:rgba(162,89,255,.15);color:#fff;font-size:22px;cursor:pointer;flex:none;transition:.25s}
+.ic:hover{background:var(--p);box-shadow:0 0 20px var(--p)}.ic.rec{background:#e11d48;animation:pulse 1s infinite}
+#plus{transition:.3s}#plus.o{transform:rotate(45deg)}
+#pop{position:absolute;bottom:76px;left:14px;padding:8px;display:flex;flex-direction:column;gap:4px;animation:rise .25s both;z-index:9}
+#pop button{background:none;border:0;color:var(--t);text-align:left;padding:11px 16px;border-radius:12px;cursor:pointer;font-size:14px;font-family:inherit}
+#pop button:hover{background:rgba(162,89,255,.25)}
+#modes{display:flex;gap:8px;padding:0 12px 6px;flex-wrap:wrap}
+.mode{font-size:11px;padding:6px 12px;border-radius:16px;border:1px solid var(--b);cursor:pointer;color:var(--m);letter-spacing:1px}
+.mode.on{background:var(--p2);color:#fff;box-shadow:0 0 16px var(--p)}
+#files{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px}
+.f{font-size:12px;padding:4px 10px;border-radius:12px;background:rgba(162,89,255,.2);border:1px solid var(--b)}
+@media(max-width:760px){#side{position:fixed;z-index:20;top:0;bottom:0;left:0;margin:0;border-radius:0 22px 22px 0;transform:translateX(-105%);background:#12082a}#side.o{transform:none}#menu{display:block}#main{padding:10px}}
+#fx{position:fixed;inset:0;z-index:1;pointer-events:none}
+.aur{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;mix-blend-mode:screen}
+.aur i{position:absolute;left:-20%;width:140%;height:40vh;filter:blur(60px);opacity:.28;border-radius:50%;background:linear-gradient(90deg,transparent,#7c3aed,#d946ef,#6366f1,transparent);animation:aur 12s ease-in-out infinite alternate}
+.aur i:nth-child(1){top:5%}.aur i:nth-child(2){top:35%;animation-delay:-4s;animation-duration:16s;opacity:.2}.aur i:nth-child(3){top:60%;animation-delay:-8s;animation-duration:19s;opacity:.22}
+@keyframes aur{0%{transform:translateX(-8%) skewY(-6deg) scaleY(.8)}100%{transform:translateX(8%) skewY(6deg) scaleY(1.3)}}
+.floor{position:fixed;left:-50%;right:-50%;bottom:-30vh;height:70vh;z-index:0;pointer-events:none;background:linear-gradient(rgba(162,89,255,.35) 1px,transparent 1px) 0 0/60px 60px,linear-gradient(90deg,rgba(162,89,255,.35) 1px,transparent 1px) 0 0/60px 60px;transform:perspective(500px) rotateX(68deg);animation:gr 3s linear infinite;-webkit-mask-image:linear-gradient(transparent,#000 70%);mask-image:linear-gradient(transparent,#000 70%);opacity:.5}
+@keyframes gr{to{background-position:0 60px,0 0}}
+.scan{position:fixed;left:0;right:0;height:140px;z-index:1;pointer-events:none;background:linear-gradient(transparent,rgba(162,89,255,.07),transparent);animation:sc 7s linear infinite}
+@keyframes sc{from{top:-140px}to{top:100%}}
+@property --a{syntax:'<angle>';inherits:false;initial-value:0deg}
+#box{position:relative}
+#box::before{content:'';position:absolute;inset:-2px;border-radius:28px;padding:2px;background:conic-gradient(from var(--a),#7c3aed,#e879f9,#22d3ee,#7c3aed);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 4s linear infinite;pointer-events:none}
+@keyframes spin{to{--a:360deg}}
+.orb{position:relative;display:inline-block;padding:46px clamp(22px,6vw,60px)}
+.orb i{position:absolute;inset:0;border:1px solid rgba(192,132,252,.5);border-radius:50%;animation:ro 9s linear infinite}
+.orb i:nth-child(2){inset:-14px;border-color:rgba(232,121,249,.35);animation-duration:14s;animation-direction:reverse;border-style:dashed}
+.orb i:nth-child(3){inset:-30px;border-color:rgba(99,102,241,.3);animation-duration:22s}
+.orb i::after{content:'';position:absolute;top:-4px;left:50%;width:8px;height:8px;border-radius:50%;background:#e9d5ff;box-shadow:0 0 14px 4px var(--p)}
+@keyframes ro{to{transform:rotate(360deg)}}
+.logo{background-size:250% 100%;animation:pulse 3s infinite,sh 5s linear infinite}
+@keyframes sh{to{background-position:250% 0}}
+.msg{transform-origin:left bottom}.u{transform-origin:right bottom}
+@keyframes rise{from{opacity:0;transform:translateY(26px) scale(.94);filter:blur(8px)}}
+.a{animation:rise .5s both,gl 4s ease-in-out infinite alternate}
+@keyframes gl{to{box-shadow:0 0 26px rgba(162,89,255,.3)}}
+.h{animation:rise .5s both}
+.chip,.mode,.ic,.btn{position:relative;overflow:hidden}
+.chip{animation:fy 5s ease-in-out infinite}.chip:nth-child(2){animation-delay:-1.6s}.chip:nth-child(3){animation-delay:-3.2s}
+@keyframes fy{50%{transform:translateY(-7px)}}
+.rp{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:rpl .6s linear;pointer-events:none}
+@keyframes rpl{to{transform:scale(4);opacity:0}}
+.ic:hover{transform:scale(1.12) rotate(8deg)}
+#side{animation:sl .8s both}#bar{animation:up .9s .2s both}
+@keyframes sl{from{opacity:0;transform:translateX(-40px)}}@keyframes up{from{opacity:0;transform:translateY(50px)}}
+.cr{font-size:12px;letter-spacing:3px;text-transform:uppercase;margin-top:6px;background:linear-gradient(90deg,#8b6bd9,#fff,#e879f9,#8b6bd9);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sh 4s linear infinite}.cr.sm{font-size:10px;letter-spacing:1.5px;text-align:center}
+</style></head><body>
+<canvas id="stars"></canvas><canvas id="fx"></canvas><div class="aur"><i></i><i></i><i></i></div><div class="floor"></div><div class="scan"></div><div class="glow g1"></div><div class="glow g2"></div>
+
+<div id="app" class="hide">
+<aside id="side" class="glass"><div class="logo" style="font-size:22px;letter-spacing:2px">Vardhan AI</div>
+<button class="btn" id="new">+ New chat</button><button class="btn" id="memoryBtn" style="background:rgba(162,89,255,.2);border:1px solid var(--b)">🧠 AI Memory</button><div id="hist"></div>
+<div style="font-size:12px;color:var(--m)">No account required · chats saved on this device</div></aside>
+<section id="main"><div id="top"><button id="menu">☰</button><span style="color:var(--m);font-size:12px;letter-spacing:2px;flex:1">Vardhan AI · NEURAL CORE</span><button class="mode" id="voiceToggle" type="button">🔊 VOICE OFF</button><button class="mode hide" id="installBtn" type="button">＋ INSTALL</button></div>
+<div id="chat"></div>
+<div id="files"></div>
+<div id="modes"><span class="mode on" data-m="smart">⚡ SMART</span><span class="mode" data-m="deep">🧠 DEEP THINK</span><span class="mode" data-m="image">🎨 IMAGE</span><span class="mode" data-m="doc">📄 DOCUMENT</span><span class="mode" data-m="search">🌐 WEB SEARCH</span></div>
+<div id="bar"><div id="pop" class="glass hide"><button data-a="photo">🖼️ Photos</button><button data-a="cam">📷 Camera</button><button data-a="file">📎 PDF / Documents</button><button data-a="voice">🎙️ Voice</button></div>
+<div id="box" class="glass"><button class="ic" id="plus">+</button>
+<textarea id="q" rows="1" placeholder="Ask Vardhan AI anything..."></textarea>
+<button class="ic" id="mic">🎙</button><button class="ic" id="send">➤</button></div></div></section></div>
+<input type="file" id="fp" accept="image/*" multiple hidden><input type="file" id="fc" accept="image/*" capture="environment" hidden>
+<input type="file" id="fd" accept=".pdf,.doc,.docx,.txt,.md,.csv,.json,.html" multiple hidden>
+<div id="memoryModal" class="hide" style="position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:18px">
+ <div class="glass" style="width:min(560px,100%);max-height:85vh;overflow:auto;padding:20px">
+  <div style="font-size:20px;font-weight:800;margin-bottom:6px">Vardhan AI Memory</div>
+  <div style="color:var(--m);font-size:12px;margin-bottom:12px">Add details you want Vardhan AI to remember across chats. You control and can delete these memories.</div>
+  <textarea id="memoryInput" rows="3" placeholder="Example: I prefer concise explanations and I'm learning Python." style="width:100%;padding:12px;resize:vertical"></textarea>
+  <div style="display:flex;gap:8px;margin:10px 0"><button class="btn" id="saveMemory">Save memory</button><button class="btn" id="closeMemory" style="background:rgba(162,89,255,.2)">Close</button></div>
+  <div id="memoryList" style="display:flex;flex-direction:column;gap:8px"></div>
+ </div>
+</div>
+
+<script>
+// ---------- starfield ----------
+const cv=document.getElementById('stars'),cx=cv.getContext('2d');let S=[],sh=[];
+function rs(){cv.width=innerWidth;cv.height=innerHeight;S=Array.from({length:Math.min(260,innerWidth/4)},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,z:Math.random()*2+.3,t:Math.random()*6}))}
+rs();addEventListener('resize',rs);
+(function dr(){return;cx.clearRect(0,0,cv.width,cv.height);
+for(const s of S){s.t+=.03;s.y+=s.z*.15;if(s.y>cv.height)s.y=0;cx.globalAlpha=.4+.6*Math.abs(Math.sin(s.t));cx.fillStyle=s.z>1.6?'#e9d5ff':'#a78bfa';cx.beginPath();cx.arc(s.x,s.y,s.z,0,7);cx.fill()}
+if(Math.random()<.012)sh.push({x:Math.random()*cv.width,y:Math.random()*cv.height/2,l:0});
+sh=sh.filter(k=>k.l<40);for(const k of sh){k.l++;k.x+=14;k.y+=7;cx.globalAlpha=1-k.l/40;cx.strokeStyle='#fff';cx.beginPath();cx.moveTo(k.x,k.y);cx.lineTo(k.x-60,k.y-30);cx.stroke()}
+requestAnimationFrame(dr)})();
+
+// ---------- No-login mode: local chats and memories ----------
+const $=i=>document.getElementById(i);
+let user={id:'local-device'}, chats=[], cur=null, mode='smart', atts=[], busy=false, memories=[], rec=null;
+let voiceReplies=false, installPrompt=null;
+const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function loadLocal(){
+  try{chats=JSON.parse(localStorage.getItem('vardhan_chats')||'[]');}catch{chats=[]}
+  try{memories=JSON.parse(localStorage.getItem('vardhan_memories')||'[]');}catch{memories=[]}
+  if(!Array.isArray(chats))chats=[];if(!Array.isArray(memories))memories=[];
+  $('app').classList.remove('hide');
+  if(!chats.length)newChat();else{cur=chats[0];render()}
+}
+function saveLocal(){localStorage.setItem('vardhan_chats',JSON.stringify(chats.slice(0,60)))}
+async function saveChat(){saveLocal()}
+loadLocal();
+
+function showToast(message){
+  const t=document.createElement('div');t.textContent=message;
+  t.style.cssText='position:fixed;z-index:90;bottom:100px;left:50%;transform:translateX(-50%);background:#21113c;color:#fff;border:1px solid rgba(162,89,255,.5);padding:11px 15px;border-radius:12px;max-width:90vw;font:13px system-ui';
+  document.body.appendChild(t);setTimeout(()=>t.remove(),4200);
+}
+function newChat(){
+  cur={id:crypto.randomUUID(),title:'New chat',msgs:[]};chats.unshift(cur);render();side(false);saveChat();
+}
+$('new').onclick=newChat;
+function renderHist(){
+  $('hist').innerHTML='';
+  chats.filter(c=>c.msgs.length||c===cur).forEach(c=>{
+    const d=document.createElement('div');d.className='h'+(c===cur?' on':'');
+    d.textContent='💬 '+c.title;d.onclick=()=>{cur=c;render();side(false)};
+    $('hist').appendChild(d);
+  });
+}
+function side(o){$('side').classList.toggle('o',o)}
+$('menu').onclick=()=>side(!$('side').classList.contains('o'));
+function render(){
+  renderHist();const c=$('chat');c.innerHTML='';
+  if(!cur.msgs.length){
+    c.innerHTML='<div class="hero"><div class="orb"><i></i><i></i><i></i><div class="logo">Vardhan AI</div></div><p>Ask, think deeply, create images, search the web and analyse documents.</p><div class="chips"><span class="chip">Explain quantum computing simply</span><span class="chip">Search latest AI news</span><span class="chip">Create an image of a violet galaxy city</span></div></div>';
+    c.querySelectorAll('.chip').forEach(x=>x.onclick=()=>{$('q').value=x.textContent;if(/image/i.test(x.textContent))setMode('image');if(/search/i.test(x.textContent))setMode('search');send()});
+  }
+  cur.msgs.forEach(addBubble);
+}
+function addBubble(m){
+  const d=document.createElement('div');d.className='msg '+(m.r==='user'?'u':'a');
+  if(m.r==='user')d.textContent=m.t;else fillAI(d,m);
+  $('chat').appendChild(d);$('chat').scrollTop=1e9;return d;
+}
+function speak(text){
+  if(!('speechSynthesis'in window)){showToast('Speech playback is not supported in this browser.');return}
+  speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(String(text||'').slice(0,12000));
+  u.lang=navigator.language||'en-US';speechSynthesis.speak(u);
+}
+function fillAI(d,m){
+  d.textContent=m.t||'';
+  if(m.imageData){const im=document.createElement('img');im.src=m.imageData;im.alt='Image generated by Vardhan AI';im.loading='lazy';im.style.cssText='display:block;max-width:100%;height:auto;border-radius:14px;margin-top:12px';d.appendChild(im)}
+  if(Array.isArray(m.sources)&&m.sources.length){
+    const wrap=document.createElement('div');wrap.style.cssText='margin-top:12px;padding-top:9px;border-top:1px solid rgba(162,89,255,.25);font-size:12px';
+    const label=document.createElement('div');label.textContent='Sources';label.style.cssText='font-weight:700;margin-bottom:6px';wrap.appendChild(label);
+    m.sources.slice(0,8).forEach(s=>{
+      if(!s||!/^https:\/\//i.test(s.uri||''))return;
+      const a=document.createElement('a');a.href=s.uri;a.target='_blank';a.rel='noopener noreferrer';a.textContent=s.title||s.uri;
+      a.style.cssText='display:block;color:#c4b5fd;margin:4px 0;text-decoration:underline;overflow-wrap:anywhere';wrap.appendChild(a);
+    });
+    d.appendChild(wrap);
+  }
+  const actions=document.createElement('div');actions.className='act';
+  const dlBtn=document.createElement('button');dlBtn.textContent='⬇ Download '+(m.imageData?'image':'text');dlBtn.onclick=()=>dl(m);
+  const copyBtn=document.createElement('button');copyBtn.textContent='⧉ Copy';copyBtn.onclick=()=>navigator.clipboard?.writeText(m.t||'');
+  const speakBtn=document.createElement('button');speakBtn.textContent='🔊 Read aloud';speakBtn.onclick=()=>speak(m.t);
+  actions.append(dlBtn,copyBtn,speakBtn);d.appendChild(actions);
+}
+function dl(m){
+  if(m.imageData){const a=document.createElement('a');a.href=m.imageData;a.download='vardhan-ai-image.png';a.click();return}
+  const blob=new Blob([m.t||''],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vardhan-ai-response.txt';a.click();URL.revokeObjectURL(a.href);
+}
+
+// ---------- Local AI memory (stored in this browser) ----------
+function renderMemories(){
+  const list=$('memoryList');list.innerHTML='';
+  if(!memories.length){list.textContent='No saved memories yet.';return}
+  memories.forEach(mem=>{
+    const row=document.createElement('div');row.className='memory-item';
+    const content=document.createElement('span');content.textContent=mem.content;content.style.flex='1';
+    const del=document.createElement('button');del.textContent='Delete';del.onclick=()=>{memories=memories.filter(x=>x.id!==mem.id);localStorage.setItem('vardhan_memories',JSON.stringify(memories));renderMemories()};
+    row.append(content,del);list.appendChild(row);
+  });
+}
+$('memoryBtn').onclick=()=>{$('memoryModal').classList.remove('hide');renderMemories()};
+$('closeMemory').onclick=()=>$('memoryModal').classList.add('hide');
+$('saveMemory').onclick=()=>{
+  const content=$('memoryInput').value.trim();if(!content)return;
+  if(content.length>1200){showToast('Keep each memory under 1,200 characters.');return}
+  memories.unshift({id:crypto.randomUUID(),content,created_at:new Date().toISOString()});
+  localStorage.setItem('vardhan_memories',JSON.stringify(memories));$('memoryInput').value='';renderMemories();showToast('Memory saved on this device.');
+};
+
+// ---------- modes / attachments ----------
+function setMode(m){mode=m;document.querySelectorAll('.mode[data-m]').forEach(x=>x.classList.toggle('on',x.dataset.m===m))}
+document.querySelectorAll('.mode[data-m]').forEach(x=>x.onclick=()=>setMode(x.dataset.m));
+$('plus').onclick=()=>{$('pop').classList.toggle('hide');$('plus').classList.toggle('o')};
+function closePop(){$('pop').classList.add('hide');$('plus').classList.remove('o')}
+$('pop').onclick=e=>{const a=e.target.dataset.a;if(!a)return;closePop();if(a==='photo')$('fp').click();if(a==='cam')$('fc').click();if(a==='file')$('fd').click();if(a==='voice')voice()};
+function showFiles(){
+  $('files').innerHTML=atts.map((a,i)=>'<span class="f">'+(a.img?'🖼️ ':'📄 ')+esc(a.name)+' <b style="cursor:pointer" data-i="'+i+'">✕</b></span>').join('');
+  $('files').querySelectorAll('b').forEach(b=>b.onclick=()=>{atts.splice(Number(b.dataset.i),1);showFiles()});
+}
+async function addFiles(fl){
+  for(const f of fl){
+    const n=f.name.toLowerCase();
+    try{
+      if(f.type.startsWith('image/'))atts.push({name:f.name,img:f});
+      else if(n.endsWith('.pdf')){
+        pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const p=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;let t='';
+        for(let i=1;i<=Math.min(p.numPages,40);i++){const pg=await p.getPage(i);t+=(await pg.getTextContent()).items.map(x=>x.str).join(' ')+'\\n'}
+        atts.push({name:f.name,text:t});
+      }else if(n.endsWith('.docx'))atts.push({name:f.name,text:(await mammoth.extractRawText({arrayBuffer:await f.arrayBuffer()})).value});
+      else atts.push({name:f.name,text:await f.text()});
+    }catch(e){atts.push({name:f.name+' (could not read)',text:''})}
+  }
+  showFiles();
+}
+[['fp'],['fc'],['fd']].forEach(([i])=>$(i).onchange=e=>{addFiles([...e.target.files]);e.target.value=''});
+
+// ---------- voice input and spoken replies ----------
+function voice(){
+  const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!R){showToast('Speech input is not supported in this browser. Try Chrome on Android.');return}
+  if(rec){rec.stop();return}
+  rec=new R();rec.interimResults=true;rec.continuous=false;rec.lang=navigator.language||'en-US';
+  $('mic').classList.add('rec');
+  rec.onresult=e=>{$('q').value=[...e.results].map(r=>r[0].transcript).join(' ');$('q').dispatchEvent(new Event('input'))};
+  rec.onend=()=>{rec=null;$('mic').classList.remove('rec')};
+  rec.onerror=()=>{rec=null;$('mic').classList.remove('rec');showToast('Voice input stopped. Check microphone permission.')};
+  rec.start();
+}
+$('mic').onclick=voice;
+$('voiceToggle').onclick=()=>{
+  voiceReplies=!voiceReplies;
+  $('voiceToggle').textContent=voiceReplies?'🔊 VOICE ON':'🔊 VOICE OFF';
+  $('voiceToggle').classList.toggle('on',voiceReplies);
+  if(!voiceReplies&&'speechSynthesis'in window)speechSynthesis.cancel();
+};
+
+// ---------- Gemini ----------
+const SYS={
+  smart:'You are Vardhan AI, a brilliant, warm, precise assistant. Give clear, intelligent, well-structured answers.',
+  deep:'You are Vardhan AI in Deep Think mode. Think carefully, check assumptions, compare alternatives, and provide a concise but thorough final answer. Do not reveal private chain-of-thought; provide a brief explanation of the conclusion.',
+  doc:'You are Vardhan AI in Document mode. Produce a complete, professional, well-structured document with title, headings and body, ready to copy or download. Use attached material where relevant.',
+  image:'You are Vardhan AI image creator. Create the requested visual as an image. Follow the subject, composition, style, colors and aspect ratio. Do not return SVG or code.',
+  search:'You are Vardhan AI with web search. Use Google Search grounding for current or verifiable facts. Summarize clearly, distinguish facts from uncertainty, and cite the grounded sources returned by the search tool.'
+};
+$('q').oninput=e=>{e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+'px'};
+$('q').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}};
+$('send').onclick=send;
+async function send(){
+  const q=$('q').value.trim();if((!q&&!atts.length)||busy)return;
+  busy=true;closePop();
+  const selectedMode=mode;
+  const imgs=atts.filter(a=>a.img).map(a=>a.img);
+  const docs=atts.filter(a=>a.text).map(a=>'[Document: '+a.name+']\\n'+a.text.slice(0,60000)).join('\\n\\n');
+  const label=q+(atts.length?'\\n📎 '+atts.map(a=>a.name).join(', '):'');
+  cur.msgs.push({r:'user',t:label});
+  if(cur.title==='New chat')cur.title=(q||atts[0].name).slice(0,48);
+  if(cur.msgs.length===1)render();else addBubble(cur.msgs.at(-1));
+  $('q').value='';$('q').style.height='auto';atts=[];showFiles();renderHist();
+  const d=document.createElement('div');d.className='msg a';
+  d.innerHTML='<div class="think"><span class="dot"></span><span class="dot"></span><span class="dot"></span>&nbsp;'+(selectedMode==='deep'?'Thinking deeply…':selectedMode==='image'?'Creating your image…':selectedMode==='search'?'Searching the web…':'Thinking…')+'</div>';
+  $('chat').appendChild(d);$('chat').scrollTop=1e9;
+  const history=cur.msgs.slice(0,-1).slice(-10).map(m=>(m.r==='user'?'User: ':'Vardhan AI: ')+(m.t||'')).join('\\n');
+  const memoryContext=memories.length?'\\n\\nUser-approved memories (use only when relevant):\\n'+memories.map(x=>'- '+x.content).join('\\n'):'';
+  const prompt='Identity: You are Vardhan AI, created by Potharaju Srivardhan. Be warm, accurate and helpful. If asked who created you, say Potharaju Srivardhan.\\n\\n'+SYS[selectedMode]+'\\n\\n'+history+memoryContext+(docs?'\\n\\nAttached documents:\\n'+docs:'')+'\\n\\nLatest user request: '+(q||'Please analyse the attached files.');
+  let m={r:'ai',t:''};
+  try{
+    const imgData=await Promise.all(imgs.slice(0,3).map(f=>new Promise((resolve,reject)=>{
+      const fr=new FileReader();fr.onload=()=>resolve({type:f.type||'image/jpeg',data:String(fr.result).split(',')[1]});fr.onerror=()=>reject(new Error('Could not read image'));fr.readAsDataURL(f);
+    })));
+    const res=await fetch('/.netlify/functions/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt,images:imgData,mode:selectedMode,max:selectedMode==='image'?2500:3500})
+    });
+    const j=await res.json();if(!res.ok)throw new Error(j.error||'Server error');
+    m.t=j.text||'No response was returned.';
+    if(selectedMode==='image'&&j.image?.data)m.imageData='data:'+(j.image.mimeType||'image/png')+';base64,'+j.image.data;
+    if(Array.isArray(j.sources))m.sources=j.sources;
+  }catch(e){m.t='⚠️ '+(e.message||'Something went wrong. Please try again.')}
+  d.innerHTML='';fillAI(d,m);cur.msgs.push(m);await saveChat();busy=false;renderHist();
+  if(voiceReplies&&m.t&&!m.t.startsWith('⚠️'))speak(m.t);
+}
+
+// ---------- PWA install prompt ----------
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();installPrompt=e;$('installBtn').classList.remove('hide');
+});
+$('installBtn').onclick=async()=>{
+  if(!installPrompt){showToast('In Chrome on Android, open the browser menu and choose Install app or Add to Home screen.');return}
+  installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;$('installBtn').classList.add('hide');
+};
+window.addEventListener('appinstalled',()=>{$('installBtn').classList.add('hide');showToast('Vardhan AI installed.')});
+// ---------- FX engine ----------
+(function(){const c=$('fx'),x=c.getContext('2d');let W,H,L=[],P=[],O=[],K=[],mx=0,my=0,tx=0,ty=0,ux=-999,uy=-999,act=0;
+function rz(){W=c.width=innerWidth;H=c.height=innerHeight;const n=Math.min(180,W/6|0);
+ L=[0,1,2].map(d=>Array.from({length:Math.round(n/(d+1))},()=>({x:Math.random()*W,y:Math.random()*H,r:(d+1)*.7,s:(d+1)*.12,t:Math.random()*9,d:d+1,ox:0,oy:0,vx:0,vy:0})));
+ O=Array.from({length:7},()=>({x:Math.random()*W,y:Math.random()*H,r:60+Math.random()*120,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,h:260+Math.random()*80}))}
+rz();addEventListener('resize',rz);
+addEventListener('pointermove',e=>{ux=e.clientX;uy=e.clientY;act=1;tx=(e.clientX/W-.5)*2;ty=(e.clientY/H-.5)*2;if(Math.random()<.5)P.push({x:e.clientX,y:e.clientY,vx:(Math.random()-.5)*1.5,vy:(Math.random()-.5)*1.5-.5,l:1})});
+addEventListener('touchstart',e=>{const t=e.touches[0];ux=t.clientX;uy=t.clientY;act=1},{passive:true});
+addEventListener('touchmove',e=>{const t=e.touches[0];ux=t.clientX;uy=t.clientY;act=1;tx=(ux/W-.5)*2;ty=(uy/H-.5)*2;if(Math.random()<.6)P.push({x:ux,y:uy,vx:(Math.random()-.5)*1.5,vy:(Math.random()-.5)*1.5-.5,l:1})},{passive:true});
+addEventListener('touchend',()=>{act=0;ux=uy=-999},{passive:true});
+documentElement_leave();function documentElement_leave(){document.addEventListener('pointerleave',()=>{act=0;ux=uy=-999})}
+addEventListener('pointerdown',e=>{ux=e.clientX;uy=e.clientY;act=1;for(const l of L)for(const s of l){const dx=s.x+s.ox-ux,dy=s.y+s.oy-uy,d=Math.hypot(dx,dy)||1;if(d<260){const f=(1-d/260)*9*s.d/2;s.vx+=dx/d*f;s.vy+=dy/d*f}}for(let i=0;i<26;i++){const a=Math.random()*6.28,s=1+Math.random()*4;P.push({x:e.clientX,y:e.clientY,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:1.4})}
+ const b=e.target.closest&&e.target.closest('.ic,.btn,.chip,.mode');if(b){const r=b.getBoundingClientRect(),d=document.createElement('span'),z=Math.max(r.width,r.height);d.className='rp';d.style.cssText='width:'+z+'px;height:'+z+'px;left:'+(e.clientX-r.left-z/2)+'px;top:'+(e.clientY-r.top-z/2)+'px';b.appendChild(d);setTimeout(()=>d.remove(),600)}});
+function f(){x.clearRect(0,0,W,H);mx+=(tx-mx)*.05;my+=(ty-my)*.05;
+ for(const o of O){o.x+=o.vx;o.y+=o.vy;if(o.x<-o.r)o.x=W+o.r;if(o.x>W+o.r)o.x=-o.r;if(o.y<-o.r)o.y=H+o.r;if(o.y>H+o.r)o.y=-o.r;
+  const g=x.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);g.addColorStop(0,'hsla('+o.h+',90%,60%,.14)');g.addColorStop(1,'transparent');x.fillStyle=g;x.fillRect(o.x-o.r,o.y-o.r,o.r*2,o.r*2)}
+ const pts=[];
+ for(const l of L)for(const s of l){s.t+=.04;s.y+=s.s;if(s.y>H)s.y=0;
+  {const bx=s.x+mx*s.d*14+s.ox,by=s.y+my*s.d*14+s.oy,dx=bx-ux,dy=by-uy,dd=Math.hypot(dx,dy)||1;if(act&&dd<170){const f=(1-dd/170)*s.d*.8;s.vx+=dx/dd*f-dy/dd*f*.7;s.vy+=dy/dd*f+dx/dd*f*.7}
+  s.vx-=s.ox*.035;s.vy-=s.oy*.035;s.vx*=.91;s.vy*=.91;s.ox+=s.vx;s.oy+=s.vy}
+  const px=s.x+mx*s.d*14+s.ox,py=s.y+my*s.d*14+s.oy;
+  x.globalAlpha=.35+.65*Math.abs(Math.sin(s.t));x.fillStyle=s.d>2?'#f5e8ff':s.d>1?'#c4a1ff':'#8b6bd9';x.shadowBlur=s.d>2?10:0;x.shadowColor='#c084fc';x.beginPath();x.arc(px,py,s.r,0,7);x.fill();if(s.d>2)pts.push([px,py])}
+ x.shadowBlur=0;x.lineWidth=.6;
+ for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i][0]-pts[j][0],dy=pts[i][1]-pts[j][1],d=dx*dx+dy*dy;if(d<14000){x.globalAlpha=(1-d/14000)*.4;x.strokeStyle='#c084fc';x.beginPath();x.moveTo(pts[i][0],pts[i][1]);x.lineTo(pts[j][0],pts[j][1]);x.stroke()}}
+ if(Math.random()<.02)K.push({x:Math.random()*W,y:Math.random()*H*.5,l:0,v:12+Math.random()*10});
+ K=K.filter(k=>k.l<50);for(const k of K){k.l++;k.x+=k.v;k.y+=k.v*.5;const g=x.createLinearGradient(k.x,k.y,k.x-110,k.y-55);g.addColorStop(0,'rgba(255,255,255,'+(1-k.l/50)+')');g.addColorStop(1,'transparent');x.globalAlpha=1;x.strokeStyle=g;x.lineWidth=2;x.beginPath();x.moveTo(k.x,k.y);x.lineTo(k.x-110,k.y-55);x.stroke()}
+ P=P.filter(p=>p.l>0);for(const p of P){p.x+=p.vx;p.y+=p.vy;p.vy+=.03;p.l-=.02;x.globalAlpha=Math.max(p.l,0);x.fillStyle=Math.random()<.5?'#e879f9':'#a78bfa';x.shadowBlur=8;x.shadowColor='#a259ff';x.beginPath();x.arc(p.x,p.y,2,0,7);x.fill()}
+ x.shadowBlur=0;x.globalAlpha=1;requestAnimationFrame(f)}
+f()})();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
+</script></body></html>
